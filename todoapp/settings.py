@@ -31,6 +31,7 @@ DEBUG = True
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['stark-lake-46725.herokuapp.com']
 
+
 # Application definition
 
 INSTALLED_APPS = [
