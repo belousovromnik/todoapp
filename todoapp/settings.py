@@ -130,34 +130,12 @@ def get_cache():
     if not environment_ready:
         cache = {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
     else:
-        servers = os.environ['MEMCACHIER_SERVERS']
-        username = os.environ['MEMCACHIER_USERNAME']
-        password = os.environ['MEMCACHIER_PASSWORD']
         cache = {
             'BACKEND': 'django_bmemcached.memcached.BMemcached',
-            'TIMEOUT': 300,
-            'LOCATION': servers,
+            'LOCATION': os.environ.get('MEMCACHEDCLOUD_SERVERS').split(','),
             'OPTIONS': {
-                'binary': True,
-                'username': username,
-                'password': password,
-                'behaviors': {
-                    # Enable faster IO
-                    'no_block': True,
-                    'tcp_nodelay': True,
-                    # Keep connection alive
-                    'tcp_keepalive': True,
-                    # Timeout settings
-                    'connect_timeout': 2000,  # ms
-                    'send_timeout': 750 * 1000,  # us
-                    'receive_timeout': 750 * 1000,  # us
-                    '_poll_timeout': 2000,  # ms
-                    # Better failover
-                    'ketama': True,
-                    'remove_failed': 1,
-                    'retry_timeout': 2,
-                    'dead_timeout': 30,
-                }
+                'username': os.environ.get('MEMCACHEDCLOUD_USERNAME'),
+                'password': os.environ.get('MEMCACHEDCLOUD_PASSWORD')
             }
         }
     return {'default': cache}
