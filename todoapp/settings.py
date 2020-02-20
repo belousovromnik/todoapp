@@ -134,7 +134,7 @@ def get_cache():
         username = os.environ['MEMCACHIER_USERNAME']
         password = os.environ['MEMCACHIER_PASSWORD']
         cache = {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'BACKEND': 'django_bmemcached.memcached.BMemcached',
             'TIMEOUT': 300,
             'LOCATION': servers,
             'OPTIONS': {
