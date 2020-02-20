@@ -6,3 +6,4 @@ pillow
 pylibmc
 python-binary-memcached
 django-bmemcached
+django-pylibmc
