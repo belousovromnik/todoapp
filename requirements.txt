@@ -1,9 +1,9 @@
-django
-django_heroku
-psycopg2
 dj_database_url
-pillow
-pylibmc
-python-binary-memcached
+django
 django-bmemcached
-django-pylibmc
+django_heroku
+gunicorn==20.0.2
+psycopg2
+python-binary-memcached
+pytz==2019.3
+whitenoise==4.0

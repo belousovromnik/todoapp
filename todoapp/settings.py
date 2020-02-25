@@ -12,14 +12,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'jzd_al)s*mq5m4fthvl@xia%9@bj-h!k=)#*4tzsdo7d#9pok8'
 SECRET_KEY = os.environ.get('SECRET_KEY')
+# SECRET_KEY = 'jzd_al)s*mq5m4fthvl@xia%9@bj-h!k=)#*4tzsdo7d#9pok8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['stark-lake-46725.herokuapp.com']
+ALLOWED_HOSTS = ['pacific-cove-16802.herokuapp.com']
 
 
 # Application definition
@@ -122,45 +122,72 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 django_heroku.settings(locals())
 
 
+# def get_cache():
+#     environment_ready = all(
+#         os.environ.get(f'MEMCACHIER_{key}', False)
+#         for key in ['SERVERS', 'USERNAME', 'PASSWORD']
+#     )
+#     if not environment_ready:
+#         cache = {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
+#     else:
+#         servers = os.environ['MEMCACHIER_SERVERS']
+#         username = os.environ['MEMCACHIER_USERNAME']
+#         password = os.environ['MEMCACHIER_PASSWORD']
+#         cache = {
+#             'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+#             'TIMEOUT': 300,
+#             'LOCATION': servers,
+#             'OPTIONS': {
+#                 'binary': True,
+#                 'username': username,
+#                 'password': password,
+#                 'behaviors': {
+#                     # Enable faster IO
+#                     'no_block': True,
+#                     'tcp_nodelay': True,
+#                     # Keep connection alive
+#                     'tcp_keepalive': True,
+#                     # Timeout settings
+#                     'connect_timeout': 2000,  # ms
+#                     'send_timeout': 750 * 1000,  # us
+#                     'receive_timeout': 750 * 1000,  # us
+#                     '_poll_timeout': 2000,  # ms
+#                     # Better failover
+#                     'ketama': True,
+#                     'remove_failed': 1,
+#                     'retry_timeout': 2,
+#                     'dead_timeout': 30,
+#                 }
+#             }
+#         }
+#     return {'default': cache}
+
 def get_cache():
-    environment_ready = all(
-        os.environ.get(f'MEMCACHIER_{key}', False)
-        for key in ['SERVERS', 'USERNAME', 'PASSWORD']
-    )
-    if not environment_ready:
-        cache = {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
-    else:
+    import os
+    try:
         servers = os.environ['MEMCACHIER_SERVERS']
         username = os.environ['MEMCACHIER_USERNAME']
         password = os.environ['MEMCACHIER_PASSWORD']
-        cache = {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'TIMEOUT': 300,
-            'LOCATION': servers,
-            'OPTIONS': {
-                'binary': True,
-                'username': username,
-                'password': password,
-                'behaviors': {
-                    # Enable faster IO
-                    'no_block': True,
-                    'tcp_nodelay': True,
-                    # Keep connection alive
-                    'tcp_keepalive': True,
-                    # Timeout settings
-                    'connect_timeout': 2000,  # ms
-                    'send_timeout': 750 * 1000,  # us
-                    'receive_timeout': 750 * 1000,  # us
-                    '_poll_timeout': 2000,  # ms
-                    # Better failover
-                    'ketama': True,
-                    'remove_failed': 1,
-                    'retry_timeout': 2,
-                    'dead_timeout': 30,
+        return {
+            'default': {
+                'BACKEND': 'django_bmemcached.memcached.BMemcached',
+                # TIMEOUT is not the connection timeout! It's the default expiration
+                # timeout that should be applied to keys! Setting it to `None`
+                # disables expiration.
+                'TIMEOUT': None,
+                'LOCATION': servers,
+                'OPTIONS': {
+                    'username': username,
+                    'password': password,
                 }
             }
         }
-    return {'default': cache}
+    except:
+        return {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+            }
+        }
 
 
 CACHES = get_cache()
@@ -174,3 +201,4 @@ CACHES = get_cache()
 #         }
 #     }
 # }
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
